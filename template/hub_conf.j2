@@ -1,0 +1,19 @@
+[Interface]
+# 确定自己是 hub1 还是 hub2 并加载对应的 IP #
+{% if inventory_hostname == 'hub-01' %}
+Address = {{ hub01_tunnel_ip }}/24
+{% else %}
+Address = {{ hub02_tunnel_ip }}/24
+{% endif %}
+
+ListenPort = 51820
+PrivateKey = {{ lookup('ansible.builtin.file', './keys/hubs/private.key') }}
+
+# 自动遍历所有的 spoke 组
+{% for group in groups['spokes:children'] %}
+# Peer for {{ group }}
+[Peer]
+PublicKey = {{ lookup('ansible.builtin.file', './keys/' + group + '/public.key') }}
+# 假设每组第一个成员的变量代表全组的隧道 IP
+AllowedIPs = {{ hostvars[groups[group][0]]['wg_tunnel_ip'] }}/32
+{% endfor %}

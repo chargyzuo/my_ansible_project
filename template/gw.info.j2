@@ -1,0 +1,55 @@
+# ######### Pub info ######### #
+GW_NET_10="{{ GW_NET_10 }}"
+GW_NET_30="{{ GW_NET_30 }}"
+# GW_NETv6_LAN=" {{ GW_NETv6_LAN }} " 
+
+# ######### LAN Info ######### #
+GW_LAN_Iface="{{ GW_LAN_Iface }}"
+GW_CSW_IP="{{ GW_CSW_IP }}"
+GW_CSW_IPv6="{{ GW_CSW_IPv6 }}"
+
+# ######### WAN Info ######### #
+GW_ISP_Num="{{ GW_ISP_Num }}"
+
+# ISP1 Info #
+GW_ISP1_Name="{{ GW_ISP1_Name }}"
+GW_ISP1_Iface="{{ GW_ISP1_Iface }}"
+GW_ISP1_IP="{{ GW_ISP1_IP }}"
+GW_ISP1_Gateway="{{ GW_ISP1_Gateway }}"
+GW_ISP1_IPv6="{{ GW_ISP1_IPv6 }}"
+GW_ISP1_Gatewayv6="{{ GW_ISP1_Gatewayv6 }}"
+GW_ISP1_Bandwidth="{{ GW_ISP1_Bandwidth }}"
+
+# ISP2 Info #
+GW_ISP2_Name="{{ GW_ISP2_Name }}"
+GW_ISP2_Iface="{{ GW_ISP2_Iface }}"
+GW_ISP2_IP="{{ GW_ISP2_IP }}"
+GW_ISP2_Gateway="{{ GW_ISP2_Gateway }}"
+GW_ISP2_Bandwidth="{{ GW_ISP2_Bandwidth }}"
+
+# ######### gw_protect #############
+#need ISP1 Info & ISP2 Info
+#ISP active test des IP 
+#
+ISP_Check_IP1="223.5.5.5"
+ISP_Check_IP2="119.29.29.29"
+# ISP_Check_IP1v6="2400:3200::1"
+# ISP_Check_IP2v6="2001:dc7:1000::1"
+VPN_Check_IP1="10.8.8.8"
+VPN_Check_IP2="10.8.8.9"
+VPN_Chage_lost="20"
+# MPLS_Check_IP="192.168.168.1"
+#MPLS_Check_Rate="0.6"
+#MPLS_Route=(10.1.0.0/18 10.2.0.0/20 10.2.18.0/23 10.2.160.0/20 10.2.176.0/20 10.2.192.0/20 10.2.208.0/20 10.2.254.0/23 10.92.0.0/16)
+#GW_Have_MPLS="no"
+
+
+
+# wg_peer_ip 
+# declare -A WG_PEER_IP #}
+WG_PEER_IP=(
+    '["wgcmcc"]="{{ ISP1_tunnel_end }}"'
+    '["wgctcc"]="{{ ISP2_tunnel_end }}"'
+
+)
+

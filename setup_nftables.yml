@@ -1,0 +1,28 @@
+---
+- name: 安装并配置 nftables 网关防火墙
+  hosts: my_nodes
+  tasks:
+    - name: 安装 nftables
+      apt:
+        name: nftables
+        state: present
+        update_cache: yes
+
+    - name: 开启内核 IPv4 转发 (路由功能必备)
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        state: present
+        reload: yes
+
+    - name: 下发 nftables.conf 配置
+      template:
+        src: nftables.conf.j2
+        dest: /etc/nftables.conf
+        mode: '0750'
+
+    - name: 启用并重启 nftables 服务
+      service:
+        name: nftables
+        state: restarted
+        enabled: yes

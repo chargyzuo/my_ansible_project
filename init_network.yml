@@ -1,0 +1,21 @@
+---
+  - name: 初始化出口网关网络接口
+    hosts: my_nodes
+    tasks:
+      - name: 下发接口配置文件
+        template:
+          src: interfaces.j2
+          dest: /etc/network/interfaces
+          backup: yes  # 自动备份旧配置，万一出问题可以找回
+ 
+      - name: 彻底移除 ZeroConf 自动 IP 分配工具
+        apt:
+          name: avahi-autoipd
+          state: absent
+          purge: yes
+
+      - name: 重新启动网络服务
+        shell: "systemctl restart networking"
+        async: 10      # 异步执行，防止网络重启瞬间导致 SSH 断开引发的任务失败
+        poll: 0
+

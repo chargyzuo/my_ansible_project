@@ -1,0 +1,29 @@
+# /etc/dhcp/dhcpd.conf
+
+
+option domain-name-servers 192.168.99.10;
+
+default-lease-time 600;
+max-lease-time 7200;
+
+ddns-update-style none;
+
+# 定义 OOB 网络网段
+subnet 192.168.99.0 netmask 255.255.255.0 {
+  range 192.168.99.200 192.168.99.250; # 未绑定设备的动态分配范围
+  option routers 192.168.99.10;                   
+  option subnet-mask 255.255.255.0;       
+  option broadcast-address 192.168.99.255;       
+}
+
+# 自动生成静态 IP 绑定
+{% for host in groups['my_nodes'] %}
+  # 只有当这台机器定义了 mac_address 时才生成绑定配置
+  {% if hostvars[host]['mac_address'] is defined %}
+  host {{ host | replace('.', '_') }} {
+    hardware ethernet {{ hostvars[host]['mac_address'] }};
+    fixed-address {{ host }};
+  }
+  {% endif %}
+{% endfor %}
+

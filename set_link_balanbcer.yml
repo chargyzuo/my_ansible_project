@@ -1,0 +1,80 @@
+---
+- name: 自动化部署 FireHOL Link-Balancer
+  hosts: my_nodes 
+  become: yes
+  
+  tasks:
+    - name: 更新 apt 缓存并安装基础依赖网络工具
+      ansible.builtin.apt:
+        name:
+          - firehol      # 包含 link-balancer 工具
+          - firehol-tools 
+          - iproute2     # 提供 ip 命令
+          - dnsutils     # 提供 dig 命令 (用于 check dig)
+          - iputils-ping # 提供 ping 命令 (用于 check ping)
+        state: present
+        update_cache: yes
+
+    - name: 确保网关配置目录存在 (/etc/gw)
+      ansible.builtin.file:
+        path: /etc/gw
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: 确保 FireHOL 配置目录存在 (/etc/firehol)
+      ansible.builtin.file:
+        path: /etc/firehol
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: 下发网关基础信息文件 (gw.info)
+      ansible.builtin.template:
+        src: template/gw.info.j2
+        dest: /etc/gw/gw.info
+        owner: root
+        group: root
+        mode: '0644'
+      
+
+    - name: 下发路由策略文件 (lb.nets)
+      ansible.builtin.template:
+        src: template/lb.nets.j2
+        dest: /etc/gw/lb.nets
+        owner: root
+        group: root
+        mode: '0644'
+      
+
+    - name: 下发 Link-Balancer 主配置文件 (link-balancer.conf)
+      ansible.builtin.template:
+        src: template/link-balancer.conf.j2
+        dest: /etc/firehol/link-balancer.conf
+        owner: root
+        group: root
+        mode: '0644'
+
+    
+        
+    - name: 确保 iproute2 配置目录存在 (/etc/iproute2)
+      ansible.builtin.file:
+        path: /etc/iproute2
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: 自动配置 iproute2 路由表名称与 ID 映射
+      ansible.builtin.lineinfile:
+        path: /etc/iproute2/rt_tables
+        line: "{{ item.id }}\t{{ item.name }}"
+        state: present
+        create: yes  # 如果 rt_tables 文件不存在，则自动创建它
+      loop:
+        - { id: 200, name: 'bird' }
+        - { id: 201, name: 'ISP1' }
+        - { id: 202, name: 'ISP2' }
+        - { id: 203, name: 'LB' }

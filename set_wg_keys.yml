@@ -1,0 +1,29 @@
+---
+# 阶段一：在控制节点生成所有必要的密钥
+- name: 准备密钥对
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  tasks:
+    - name: 创建密钥存储目录
+      ansible.builtin.file:
+        path: "./keys/{{ item }}"
+        state: directory
+        mode: '0700'
+      # 包含 hubs 组和所有子 spoke 组
+      loop:
+        - hubs
+        - group_GW012
+        - group_GW034
+
+    - name: 生成密钥对
+      ansible.builtin.shell: |
+        if [ ! -f "./keys/{{ item }}/private.key" ]; then
+          wg genkey | tee "./keys/{{ item }}/private.key" | wg pubkey > "./keys/{{ item }}/public.key"
+        fi
+      args:
+        executable: /bin/bash
+      loop: 
+        - hubs
+        - group_GW012
+        - group_GW034

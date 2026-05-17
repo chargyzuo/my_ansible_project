@@ -1,0 +1,65 @@
+mac_address: "00:50:00:00:01:00"
+ansible_user: "root"
+ansible_ssh_pass: "Test@123"
+
+interfaces:
+  ens4: "192.168.61.1/30" # HA口
+# ens5: "61.8.8.2/30" # WAN口1
+# ens6: "89.7.7.2/30" # WAN口2
+  ens7: "10.12.99.2/29" # LAN口
+
+wan_ifaces: "{ens5, ens6}"
+
+GW_NET_10: "10.12.0.0/16"
+GW_NET_30: "30.12.0.0/16"
+GW_NETv6_LAN: "fdbd:cd00:1200::/64"
+
+########## LAN Info ##########
+GW_LAN_Iface: "ens7"
+GW_CSW_IP: "10.12.99.6/29"
+GW_CSW_IPv6: "fdbd:cd00:1200::6/125"
+
+########## WAN Info ##########
+GW_ISP_Num: "2"
+
+# ISP1 Info
+GW_ISP1_Name: "Telecom"
+GW_ISP1_Iface: "ens5"
+GW_ISP1_IP: "61.8.8.2/30"
+GW_ISP1_Gateway: "61.8.8.1"
+GW_ISP1_IPv6: "2001:61:8:8::2/127"
+GW_ISP1_Gatewayv6: "2001:61:8:8::1"
+GW_ISP1_Bandwidth: "100"
+
+# ISP2 Info
+GW_ISP2_Name: "mobile"
+GW_ISP2_Iface: "ens6"
+GW_ISP2_IP: "104.8.8.2/30"
+GW_ISP2_Gateway: "104.8.8.1"
+GW_ISP2_Bandwidth: "100"
+
+########## gw_protect #############
+# need ISP1 Info & ISP2 Info
+# ISP active test des IP
+ISP_Check_IP1:  "223.5.5.5"
+ISP_Check_IP2:  "119.29.29.29"
+ISP_Check_IP1v6:  "2400:3200::1"
+ISP_Check_IP2v6:  "2001:dc7:1000::1"
+VPN_Check_IP1:  "10.8.8.8"
+VPN_Check_IP2:  "10.8.8.9"
+VPN_Chage_lost:  "20"
+# MPLS_Check_IP:  "192.168.168.1"
+# MPLS_Check_Rate:  "0.6"
+# MPLS_Route:  (10.1.0.0/18 10.2.0.0/20 10.2.18.0/23 10.2.160.0/20 10.2.176.0/20 10.2.192.0/20 10.2.208.0/20 10.2.254.0/23 10.92.0.0/16)
+# GW_Have_MPLS:  "no"
+
+
+ISP1_tunnel_end: "172.20.0.1"
+ISP2_tunnel_end: "172.21.0.1"
+
+WG_server_ISP1: "59.3.3.2"
+WG_server_ISP2: "212.3.3.2"
+
+# LB subnets
+LB_LAN_subnet_1: "10.12.128.0/17"
+

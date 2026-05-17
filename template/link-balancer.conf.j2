@@ -1,0 +1,63 @@
+source /etc/gw/gw.info
+lb_file="/etc/gw/lb.nets"
+
+set_default_routes() {
+    local next_hop=${2}
+    while read line; do
+        if [[ ${line} =~ ^${1} ]]; then
+            local next_hop_define=`echo ${line} | grep -o "ISP[12]"`
+            if [ ${next_hop_define} ]; then
+                next_hop=${next_hop_define}
+            fi
+            break
+        fi
+    done < ${lb_file}
+
+    default via ${next_hop} weight 100
+    default via $([ "${next_hop}" == "ISP1" ] && echo "ISP2" || echo "ISP1") weight 0
+}
+
+{% raw %}
+get_net() {
+    local net=`echo $1 | grep -o -P "[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/?[0-9]{0,2}"`
+    echo "${net///32}"
+}
+{% endraw %}
+
+gateway6 ISP1v6 dev ${GW_ISP1_Iface} gw ${GW_ISP1_Gatewayv6} check ping "${ISP_Check_IP1v6},${ISP_Check_IP2v6}" || gateway6 ISP1v6 dev ${GW_ISP1_Iface} gw ${GW_ISP1_Gatewayv6} check dig "${ISP_Check_IP1v6},${ISP_Check_IP2v6}"
+
+table6 main noroutes
+    default via ISP1v6 weight 100
+
+
+gateway ISP1 dev ${GW_ISP1_Iface} gw ${GW_ISP1_Gateway} check ping "${ISP_Check_IP1},${ISP_Check_IP2}" || gateway ISP1 dev ${GW_ISP1_Iface} gw ${GW_ISP1_Gateway} check dig "${ISP_Check_IP1},${ISP_Check_IP2}"
+gateway ISP2 dev ${GW_ISP2_Iface} gw ${GW_ISP2_Gateway} check ping "${ISP_Check_IP1},${ISP_Check_IP2}" || gateway ISP2 dev ${GW_ISP2_Iface} gw ${GW_ISP2_Gateway} check dig "${ISP_Check_IP1},${ISP_Check_IP2}"
+
+table LB
+    set_default_routes LB ISP2
+table main
+    set_default_routes main ISP1
+
+policy
+    rules from ${GW_ISP1_IP} table ISP1
+    rules from ${GW_ISP2_IP} table ISP2
+    rules to {{ WG_server_ISP1 }} table ISP1
+    rules to {{ WG_server_ISP2 }} table ISP2
+    rules from 30.0.0.0/8 table main
+    rules from all table bird
+
+rule_policy=("^ISP1,to,main" "^ISP2,to,LB" "^[!][1-9],src,main" "^[1-9],src,LB")
+
+for rule_info in ${rule_policy[@]}; do
+    rule_info=(${rule_info//\,/ })
+    while read line; do
+        if [[ ${line} =~ ${rule_info[0]} ]]; then
+            net=`get_net "${line}"`
+            if [ ${net} ]; then
+                rules ${rule_info[1]} ${net} table ${rule_info[2]}
+            fi
+        fi
+    done < ${lb_file}
+done
+
+

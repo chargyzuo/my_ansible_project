@@ -1,0 +1,20 @@
+Interface]
+{# lookup 自动去控制器本地 keys/组名/ 目录下读取私钥 #}
+PrivateKey = {{ lookup('ansible.builtin.file', './keys/' + group_names[0] + '/private.key') }}
+Address = {{ wg_tunnel_ip }}/24
+ListenPort = 51820
+
+[Peer]
+{# 连接 Hub 01 #}
+PublicKey = {{ lookup('ansible.builtin.file', './keys/hubs/public.key') }}
+Endpoint = {{ hub01_public_ip }}:51820
+AllowedIPs = 10.255.0.0/16
+PersistentKeepalive = 25
+
+[Peer]
+{# 连接 Hub 02 #}
+PublicKey = {{ lookup('ansible.builtin.file', './keys/hubs/public.key') }}
+Endpoint = {{ hub02_public_ip }}:51820
+AllowedIPs = 10.255.0.0/16
+PersistentKeepalive = 25
+

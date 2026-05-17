@@ -1,0 +1,33 @@
+#!/usr/sbin/nft -f
+   
+flush ruleset
+
+table inet filter {
+    chain input {
+        type filter hook input priority filter; policy accept;
+    }
+
+    chain forward {
+        type filter hook forward priority filter; policy accept;
+
+        # TCP MSS Clamping: 针对 WireGuard 等接口自动调整 MSS
+        oifname "wg*" tcp flags syn tcp option maxseg size set rt mtu
+    }
+
+    chain output {
+        type filter hook output priority filter; policy accept;
+    }
+}
+
+table ip nat {
+    chain prerouting {
+        type nat hook prerouting priority dstnat;
+    }
+
+    chain postrouting {
+        type nat hook postrouting priority srcnat;
+
+        # WAN 口动态 SNAT (Masquerade)
+        oifname {{ wan_ifaces }} masquerade
+    }
+}

@@ -1,0 +1,13 @@
+###### default route for tables ######
+main: ISP1
+LB: ISP2
+
+###### source networks to LB ######
+{{ LB_LAN_subnet_1 }}
+{% if LB_LAN_subnet_2 is defined %}
+  {{ LB_LAN_subnet_2 }}
+{% endif %}
+
+###### destinations always to ISP1 or ISP2 ######
+#ISP1: 3.3.3.3
+#ISP2: 3.3.3.4

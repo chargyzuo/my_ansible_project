@@ -1,0 +1,28 @@
+---
+- name: 配置管理网 DHCP Server
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: 安装 isc-dhcp-server
+      apt:
+        name: isc-dhcp-server
+        state: present
+
+    - name: 指定 DHCP 监听的网卡
+      lineinfile:
+        path: /etc/default/isc-dhcp-server
+        regexp: '^INTERFACESv4='
+        line: 'INTERFACESv4="ens3"' # <--- 换成你控制机连接 99.0 网段的网卡名
+
+    - name: 下发配置文件
+      template:
+        src: dhcpd.conf.j2
+        dest: /etc/dhcp/dhcpd.conf
+        backup: yes
+
+    - name: 重启 DHCP 服务
+      service:
+        name: isc-dhcp-server
+        state: restarted
+        enabled: yes
+
