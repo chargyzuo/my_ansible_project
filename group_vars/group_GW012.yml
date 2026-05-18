@@ -47,6 +47,8 @@ ISP2_tunnel_end: "172.21.0.1"
 
 WG_server_ISP1: "59.3.3.2"
 WG_server_ISP2: "212.3.3.2"
+ISP1_tunnel_self: "172.20.0.101"
+ISP2_tunnel_self: "172.21.0.101"
 
 # LB subnets
 LB_LAN_subnet_1: "10.12.128.0/17"

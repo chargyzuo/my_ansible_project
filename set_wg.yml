@@ -1,0 +1,40 @@
+# 阶段二：部署 Spoke 节点
+- name: 部署 Spoke
+  hosts: spokes
+  become: yes
+  tasks:
+    - name: 安装 WireGuard
+      ansible.builtin.apt:
+        name: wireguard
+        state: present
+
+    - name: 下发 Spoke 隧道1 配置
+      ansible.builtin.template:
+        src: templates/WG_spoke_tnlct.conf.j2
+        dest: /etc/wireguard/wgct.conf
+        mode: '0600'
+    
+    - name: 下发 Spoke 隧道2 配置
+      ansible.builtin.template:
+        src: templates/WG_spoke_tnlcu.conf.j2
+        dest: /etc/wireguard/wgcu.conf
+        mode: '0600'
+
+
+
+# 阶段三：部署 Hub 节点
+- name: 部署 Hub
+  hosts: hubs
+  become: yes
+  tasks:
+    - name: 安装 WireGuard
+      ansible.builtin.apt:
+        name: wireguard
+        state: present
+
+    - name: 下发 Hub 配置
+      ansible.builtin.template:
+        src: templates/WG_hub.conf.j2
+        dest: /etc/wireguard/wg0.conf
+        mode: '0600'
+      

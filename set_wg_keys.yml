@@ -12,7 +12,8 @@
         mode: '0700'
       # 包含 hubs 组和所有子 spoke 组
       loop:
-        - hubs
+        - hub1
+        - hub2
         - group_GW012
         - group_GW034
 
@@ -24,6 +25,7 @@
       args:
         executable: /bin/bash
       loop: 
-        - hubs
+        - hub1
+        - hub2
         - group_GW012
         - group_GW034

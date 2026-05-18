@@ -1,2 +1,8 @@
 mac_address: "00:50:00:00:0b:00"
 
+interfaces:
+  ens4: "59.3.3.2/30"
+  ens7: "10.111.0.1/30"
+
+tunnel_self_IP: "172.20.0.1/24"
+

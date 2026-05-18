@@ -1,6 +1,6 @@
 ---
-  - name: 初始化出口网关网络接口
-    hosts: my_nodes
+  - name: 初始化分支出口网关网络接口
+    hosts: spokes
     tasks:
       - name: 下发接口配置文件
         template:
@@ -19,3 +19,21 @@
         async: 10      # 异步执行，防止网络重启瞬间导致 SSH 断开引发的任务失败
         poll: 0
 
+  - name: 初始化hubs网络接口
+    hosts: hubs
+    tasks:
+      - name: 下发接口配置
+        template:
+          src: template/interfaces_hub.j2
+          dest: /etc/network/interfaces
+          backup: yes
+      
+      - name: 彻底移除 ZeroConf 自动 IP 分配工具
+        apt:
+          name: avahi-autoipd
+          state: absent
+          purge: yes 
+      - name: 重新启动网络服务
+        shell: "systemctl restart networking"
+        async: 10      # 异步执行，防止网络重启瞬间导致 SSH 断开引发的任务失败
+        poll: 0

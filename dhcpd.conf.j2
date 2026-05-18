@@ -17,12 +17,12 @@ subnet 192.168.99.0 netmask 255.255.255.0 {
 }
 
 # 自动生成静态 IP 绑定
-{% for host in groups['my_nodes'] %}
+{% for host in groups['all'] %}
   # 只有当这台机器定义了 mac_address 时才生成绑定配置
   {% if hostvars[host]['mac_address'] is defined %}
   host {{ host | replace('.', '_') }} {
     hardware ethernet {{ hostvars[host]['mac_address'] }};
-    fixed-address {{ host }};
+    fixed-address {{ hostvars[host]['ansible_host'] }};
   }
   {% endif %}
 {% endfor %}
