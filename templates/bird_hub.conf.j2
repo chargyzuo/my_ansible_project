@@ -1,0 +1,113 @@
+router id {{ LAN_iface_VIP }};
+
+ipv4 table lan;
+ipv6 table lan6;
+
+protocol kernel {
+    scan time 60;
+    learn on;
+    ipv4 {
+        table lan;
+        import where net ~ [ 100.64.0.0/11{16, 29}, 10.0.0.0/8{16, 29}, 172.16.0.0/12{16,16} ];
+        export none;
+    };
+}
+
+protocol kernel {
+    scan time 60;
+    merge paths on;
+    learn on;
+    ipv6 {
+        table lan6;
+        import where net ~ [ fc00::/7{56, 125} ];
+    };
+}
+
+protocol pipe {
+    table master4;
+    peer table lan;
+    import all;
+    export none;
+}
+
+protocol pipe {
+    table master6;
+    peer table lan6;
+    import all;
+    export none;
+}
+
+protocol device {
+    scan time 60;
+}
+
+protocol direct {
+    ipv4;
+    ipv6;
+    interface "eno12399", "wg*";
+}
+
+protocol kernel {
+    scan time 60;
+    merge paths on;
+    kernel table 200;
+    ipv4 {
+        export filter {
+            if source = RTS_BGP then krt_prefsrc = {{ LAN_iface_VIP }};
+            accept;
+        };
+        import none;
+    };
+}
+
+protocol kernel {
+    scan time 60;
+    merge paths on;
+    kernel table 200;
+    ipv6 {
+        export filter {
+            if source = RTS_BGP then krt_prefsrc = {{ LAN_iface_VIP6 }};
+            accept;
+        };
+        import none;
+    };
+}
+
+
+
+template bgp wg_spoke {
+    local as 65223;
+    neighbor as 65223;
+    direct;
+    hold time 8;
+    keepalive time 2;
+    connect retry time 1;
+    ipv4 {
+        next hop self;
+        # 核心修改：Hub 需要通告它从其他 BGP 邻居学到的路由给 Spoke
+        # 所以这里不仅 export 自己的 proto 5 (lan)，还要 export 从 BGP 学到的路由
+        export filter {
+            if source = RTS_BGP then accept;   # 通告学到的 BGP 路由
+            if krt_source = 5 then accept;      # 通告本地产生的 proto 5 路由
+            reject;
+        };
+        import where net != 0.0.0.0/0;
+    };
+}
+
+{# 自动轮询 Spoke 组生成 BGP 邻居 #}
+{% for sub_group in spoke_groups %}
+{# 从该组的第一个成员获取隧道 IP 变量 #}
+{% set peer_vars = hostvars[groups[sub_group][0]] %}
+
+# BGP Peers for {{ sub_group }}
+protocol bgp {{ sub_group }}_ct from wg_spoke {
+    description "CTCC tunnel to {{ sub_group }}";
+    neighbor {{ peer_vars['ISP1_tunnel_self'] }};
+}
+
+protocol bgp {{ sub_group }}_cu from wg_spoke {
+    description "CMCC tunnel to {{ sub_group }}";
+    neighbor {{ peer_vars['ISP2_tunnel_self'] }};
+}
+{% endfor %}

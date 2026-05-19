@@ -1,0 +1,101 @@
+router id {{ LAN_iface_VIP }};
+
+ipv4 table lan;
+ipv6 table lan6;
+
+protocol kernel {
+    scan time 60;
+    learn on;
+    ipv4 {
+        table lan;
+        import where net ~ [ 100.64.0.0/11{16, 29}, 10.0.0.0/8{16, 29}, 172.16.0.0/12{16,16} ];
+        export none;
+    };
+}
+
+protocol kernel {
+    scan time 60;
+    merge paths on;
+    learn on;
+    ipv6 {
+        table lan6;
+        import where net ~ [ fc00::/7{56, 125} ];
+    };
+}
+
+protocol pipe {
+    table master4;
+    peer table lan;
+    import all;
+    export none;
+}
+
+protocol pipe {
+    table master6;
+    peer table lan6;
+    import all;
+    export none;
+}
+
+protocol device {
+    scan time 60;
+}
+
+protocol direct {
+    ipv4;
+    ipv6;
+    interface "eno12399", "wg*";
+}
+
+protocol kernel {
+    scan time 60;
+    merge paths on;
+    kernel table 200;
+    ipv4 {
+        export filter {
+            if source = RTS_BGP then krt_prefsrc = {{ LAN_iface_VIP }};
+            accept;
+        };
+        import none;
+    };
+}
+
+protocol kernel {
+    scan time 60;
+    merge paths on;
+    kernel table 200;
+    ipv6 {
+        export filter {
+            if source = RTS_BGP then krt_prefsrc = {{ LAN_iface_VIP6 }};
+            accept;
+        };
+        import none;
+    };
+}
+
+template bgp wgs {
+    local as 65223;
+    neighbor as 65223;
+    direct;
+    hold time 8;
+    keepalive time 2;
+    connect retry time 1;
+    ipv4 {
+        next hop self;
+        export where krt_source = 5;
+        import where net != 0.0.0.0/0;
+    };
+    ipv6 {
+        next hop self;
+        export where krt_source = 5;
+        import where net != ::/0;
+    };
+}
+
+protocol bgp wgctcc from wgs {
+    neighbor 172.20.0.1;
+}
+
+protocol bgp wgcucc from wgs {
+    neighbor 172.21.0.1;
+}

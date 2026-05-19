@@ -1,0 +1,49 @@
+---
+# 阶段一：部署 Spoke 节点的 BIRD 路由
+- name: 部署 Spoke BIRD 路由
+  hosts: spokes
+  become: yes
+  tasks:
+    - name: 安装 BIRD 2
+      ansible.builtin.apt:
+        name: bird2
+        state: present
+        update_cache: yes
+
+    - name: 确保 /etc/bird 目录存在
+      ansible.builtin.file:
+        path: /etc/bird
+        state: directory
+        mode: '0755'
+
+    - name: 下发 Spoke BIRD 配置
+      ansible.builtin.template:
+        src: bird_spoke.conf.j2
+        dest: /etc/bird/bird.conf
+        backup: yes
+
+
+
+
+# 阶段二：部署 Hub 节点的 BIRD 路由
+- name: 部署 Hub BIRD 路由
+  hosts: hubs
+  become: yes
+  tasks:
+    - name: 安装 BIRD 2
+      ansible.builtin.apt:
+        name: bird2
+        state: present
+        update_cache: yes
+
+    - name: 确保 /etc/bird 目录存在
+      ansible.builtin.file:
+        path: /etc/bird
+        state: directory
+        mode: '0755'
+
+    - name: 下发 Hub BIRD 配置
+      ansible.builtin.template:
+        src: bird_hub.conf.j2
+        dest: /etc/bird/bird.conf
+        backup: yes
