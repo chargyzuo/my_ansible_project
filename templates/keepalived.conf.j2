@@ -1,0 +1,56 @@
+include /etc/keepalived/.global_defs
+bfd_instance LAN_CHK {
+    neighbor_ip {{ GW_CSW_IP }}
+    min_rx 1000
+    min_tx 1000
+    idle_tx 1000
+    multiplier 3
+}
+vrrp_sync_group GW {
+    group {
+        LAN
+        SYNC
+    }
+    track_bfd {
+        LAN_CHK weight -20
+    }
+    track_interface {
+        enp23s0f0 weight -20
+        enp152s0f0 weight -10
+        enp152s0f1 weight -10
+    }
+    notify "/etc/keepalived/notify.sh"
+}
+vrrp_instance LAN {
+    version 3
+    state BACKUP
+    interface enp23s0f0
+    dont_track_primary
+    virtual_router_id 50
+    virtual_ipaddress {
+        100.93.192.1/29 dev enp23s0f0 no_track
+        180.141.158.134/26 dev enp152s0f0 no_track
+        117.141.210.107/29 dev enp152s0f1 no_track
+    }
+    virtual_ipaddress_excluded {
+        fdbd:ff1:ce00:7640::1/125 dev enp23s0f0 no_track
+    }
+    virtual_routes {
+        default via {{ GW_ISP1_Gateway }} dev {{ GW_ISP1_Iface }} table ISP1 no_track
+        default via {{ GW_ISP1_Gateway }} metric 10 no_track
+        default via {{ GW_ISP2_Gateway }} dev {{ GW_ISP2_Iface }} table ISP2 no_track
+        default via {{ GW_ISP2_Gateway }} metric 20 no_track
+    }
+    virtual_rules {
+        from {{ GW_ISP1_net }} table ISP1 no_track
+        from {{ GW_ISP2_net }} table ISP2 no_track
+    }
+    include /etc/keepalived/.is_preempt
+}
+vrrp_instance SYNC {
+    state BACKUP
+    interface {{ HA_Iface }}
+    dont_track_primary
+    virtual_router_id 51
+    include /etc/keepalived/.is_preempt
+}

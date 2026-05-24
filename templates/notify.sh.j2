@@ -1,0 +1,43 @@
+#!/bin/bash
+
+case $3 in
+    MASTER)
+        ip link set dev {{ GW_ISP1_Iface }} address {{ GW_ISP1_IfaceMAC }}
+        ip link set dev {{ GW_ISP2_Iface }} address {{ GW_ISP2_IfaceMAC }}
+        ip route del 0.0.0.0/0 via {{ GW_CSW_IP }} dev {{ GW_LAN_Iface }} metric 999
+        screen -X -S link-balancer quit
+        link-balancer
+        link-balancer boot  30
+        systemctl restart lsyncd
+        wg-quick up WG_spoke_tnlct
+        wg-quick up WG_spoke_tnlcu
+        #systemctl restart fireqos
+        systemctl restart bird
+        #/opt/gw_protect/gw_protect_start.sh
+        #systemctl restart pdns-recursor
+        systemctl restart dnsdist
+        #systemctl restart golang-sync-ipset
+        #systemctl restart dns-syncer
+    ;;
+    *)
+        ip link set dev {{ GW_ISP1_Iface }} address {{ GW_ISP1_IfaceMAC_bak }}
+        ip link set dev {{ GW_ISP2_Iface }} address {{ GW_ISP2_IfaceMAC_bak }}
+        systemctl stop golang-sync-ipset
+        systemctl stop dns-syncer
+        systemctl stop dnsdist
+        systemctl stop pdns-recursor
+        screen -X -S link-balancer quit
+        systemctl stop lsyncd
+        systemctl stop bird
+        wg-quick down WG_spoke_tnlct
+        wg-quick down WG_spoke_tnlcu
+        ip route add 0.0.0.0/0 via {{ GW_CSW_IP }} dev {{ GW_LAN_Iface }} metric 999
+        #/opt/gw_protect/gw_protect_stop.sh
+        systemctl stop fireqos
+    ;;
+esac
+
+echo $3 > /var/run/keepalived.state
+
+cat /etc/network/interfaces | grep "up" | grep "route" | grep -v -E "#|default" | sed 's/up//' | sed 's/add/replace/' | bash
+

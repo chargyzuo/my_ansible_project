@@ -8,6 +8,8 @@ interfaces:
 # ens6: "89.7.7.2/30" # WAN口2
   ens7: "10.12.99.2/29" # LAN口
 
+HA_Iface: "ens4"
+
 wan_ifaces: "{ens5, ens6}"
 
 GW_NET_10: "10.12.0.0/16"
@@ -26,7 +28,10 @@ GW_ISP_Num: "2"
 GW_ISP1_Name: "Telecom"
 GW_ISP1_Iface: "ens5"
 GW_ISP1_IP: "61.8.8.2/30"
+GW_ISP1_IfaceMAC: "87:a8:00:32:76:21"
+GW_ISP1_IfaceMAC_bak: "87:a8:00:32:76:31"
 GW_ISP1_Gateway: "61.8.8.1"
+GW_ISP1_Net: "61.8.8.0/30"
 GW_ISP1_IPv6: "2001:61:8:8::2/127"
 GW_ISP1_Gatewayv6: "2001:61:8:8::1"
 GW_ISP1_Bandwidth: "100"
@@ -34,7 +39,10 @@ GW_ISP1_Bandwidth: "100"
 # ISP2 Info
 GW_ISP2_Name: "mobile"
 GW_ISP2_Iface: "ens6"
+GW_ISP2_Net: "104.8.8.0/30"
 GW_ISP2_IP: "104.8.8.2/30"
+GW_ISP2_IfaceMAC: "87:a8:00:32:76:22"
+GW_ISP2_IfaceMAC_bak: "87:a8:00:32:76:32"
 GW_ISP2_Gateway: "104.8.8.1"
 GW_ISP2_Bandwidth: "100"
 
