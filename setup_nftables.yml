@@ -1,6 +1,6 @@
 ---
 - name: 安装并配置 nftables 网关防火墙
-  hosts: my_nodes
+  hosts: spokes
   tasks:
     - name: 安装 nftables
       apt:

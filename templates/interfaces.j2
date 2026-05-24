@@ -1,0 +1,27 @@
+auto lo
+iface lo inet loopback
+
+# OOB
+auto ens3
+iface ens3 inet dhcp
+
+# HA 接口 (ens4)
+auto ens4
+iface ens4 inet static
+    address {{ interfaces.ens4 }}
+
+
+
+# LAN 接口 (ens7)
+auto ens7
+iface ens7 inet static
+    address {{ interfaces.ens7 }}
+
+
+# static routes add
+  up ip route add {{ GW_NET_10 }} via {{ GW_CSW_IP }} dev {{ GW_LAN_Iface }} proto 5
+  up ip route add {{ GW_NET_30 }} via {{ GW_CSW_IP }} dev {{ GW_LAN_Iface }}
+  up ip route add default via {{ GW_CSW_IP }} dev  {{ GW_LAN_Iface }}  metric 999
+#  up ip -6 route add fdbd:ff1:ce00:7640::/59 via fdbd:ff1:ce00:7640::6 proto lan
+
+

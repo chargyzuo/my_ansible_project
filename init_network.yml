@@ -24,7 +24,7 @@
     tasks:
       - name: 下发接口配置
         template:
-          src: template/interfaces_hub.j2
+          src: templates/interfaces_hub.j2
           dest: /etc/network/interfaces
           backup: yes
       

@@ -1,6 +1,6 @@
 ---
 - name: 自动化部署 FireHOL Link-Balancer
-  hosts: my_nodes 
+  hosts: spokes 
   become: yes
   
   tasks:
@@ -33,7 +33,7 @@
 
     - name: 下发网关基础信息文件 (gw.info)
       ansible.builtin.template:
-        src: template/gw.info.j2
+        src: templates/gw.info.j2
         dest: /etc/gw/gw.info
         owner: root
         group: root
@@ -42,7 +42,7 @@
 
     - name: 下发路由策略文件 (lb.nets)
       ansible.builtin.template:
-        src: template/lb.nets.j2
+        src: templates/lb.nets.j2
         dest: /etc/gw/lb.nets
         owner: root
         group: root
@@ -51,7 +51,7 @@
 
     - name: 下发 Link-Balancer 主配置文件 (link-balancer.conf)
       ansible.builtin.template:
-        src: template/link-balancer.conf.j2
+        src: templates/link-balancer.conf.j2
         dest: /etc/firehol/link-balancer.conf
         owner: root
         group: root
