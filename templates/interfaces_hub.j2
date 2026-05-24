@@ -17,4 +17,5 @@ iface ens7 inet static
 
 
 ###### add static routes ##########
-
+    up ip route add {{ GW_NET_10 }} via {{ GW_CSW_IP }} dev {{ GW_LAN_Iface }} proto 5
+     
