@@ -1,3 +1,7 @@
 spoke_groups:
   - group_GW012
 #  - group_GW034
+
+GW_NET_10: "10.211.0.0/16"
+GW_CSW_IP: "10.211.9.6"
+GW_LAN_Iface: "ens7"
