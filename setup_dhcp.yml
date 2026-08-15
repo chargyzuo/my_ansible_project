@@ -1,28 +1,114 @@
 ---
-- name: 配置管理网 DHCP Server
+- name: 配置管理网 DHCP Server / OOB 网关
   hosts: localhost
   connection: local
+  vars:
+    oob_iface: eth0            # OOB 内网接口(同时是 OOB 网关口)
+    oob_ip: 192.168.99.10
+    oob_cidr: 192.168.99.0/24
+    uplink_iface: eth1         # OOB 互联网出口/上联口(桥接 Cloud0),非业务 WAN
+    upstream_dns:
+      - 223.5.5.5
+      - 1.1.1.1
   tasks:
     - name: 安装 isc-dhcp-server
       apt:
         name: isc-dhcp-server
         state: present
 
+    # === 新增任务1:配置 OOB 网关接口静态 IP ===
+    - name: 配置 OOB 接口 {{ oob_iface }} 静态 IP {{ oob_ip }}
+      copy:
+        dest: /etc/netplan/99-oob.yaml
+        mode: '0600'
+        content: |
+          network:
+            version: 2
+            renderer: networkd
+            ethernets:
+              {{ oob_iface }}:
+                dhcp4: no
+                addresses:
+                  - {{ oob_ip }}/24
+      notify: apply netplan
+
     - name: 指定 DHCP 监听的网卡
       lineinfile:
         path: /etc/default/isc-dhcp-server
         regexp: '^INTERFACESv4='
-        line: 'INTERFACESv4="ens3"' # <--- 换成你控制机连接 99.0 网段的网卡名
+        line: 'INTERFACESv4="{{ oob_iface }}"'
 
-    - name: 下发配置文件
+    - name: 下发 DHCP 配置文件
       template:
         src: dhcpd.conf.j2
         dest: /etc/dhcp/dhcpd.conf
         backup: yes
+      notify: restart dhcp
 
-    - name: 重启 DHCP 服务
+    - name: 启用并重启 DHCP 服务
+      service:
+        name: isc-dhcp-server
+        state: started
+        enabled: yes
+
+    # === 新增任务2:开启转发 + 对 OOB 网段做 SNAT ===
+    - name: 开启内核 IPv4 转发
+      sysctl:
+        name: net.ipv4.ip_forward
+        value: '1'
+        state: present
+        reload: yes
+
+    - name: 对 {{ oob_cidr }} 做 SNAT(出口 {{ uplink_iface }})
+      iptables:
+        table: nat
+        chain: POSTROUTING
+        source: "{{ oob_cidr }}"
+        out_interface: "{{ uplink_iface }}"
+        jump: MASQUERADE
+      notify: save iptables
+
+    - name: 安装 iptables 持久化组件
+      apt:
+        name: iptables-persistent
+        state: present
+
+    # === 新增任务3:OOB DNS 代理(dnsmasq,响应 DHCP 下发的 192.168.99.10) ===
+    - name: 安装 dnsmasq
+      apt:
+        name: dnsmasq
+        state: present
+
+    - name: 下发 dnsmasq DNS 转发配置(仅转发,不做 DHCP)
+      copy:
+        dest: /etc/dnsmasq.d/oob-dns.conf
+        mode: '0644'
+        content: |
+          # 只监听 OOB 网关接口,避免与 systemd-resolved / DHCP 冲突
+          interface={{ oob_iface }}
+          listen-address={{ oob_ip }}
+          bind-interfaces
+          # 本接口不做 DHCP(DHCP 由 isc-dhcp-server 负责)
+          no-dhcp-interface={{ oob_iface }}
+          # 不读取本机 resolv.conf,避免与 systemd-resolved 形成解析环路
+          no-resolv
+          server={{ upstream_dns[0] }}
+          server={{ upstream_dns[1] }}
+      notify: restart dnsmasq
+
+  handlers:
+    - name: apply netplan
+      command: netplan apply
+
+    - name: restart dhcp
       service:
         name: isc-dhcp-server
         state: restarted
-        enabled: yes
 
+    - name: save iptables
+      command: netfilter-persistent save
+
+    - name: restart dnsmasq
+      service:
+        name: dnsmasq
+        state: restarted
