@@ -1,21 +1,21 @@
 mac_address: "00:50:00:00:02:00"
 ansible_user: "root"
-ansible_ssh_pass: "Test@123"
+ansible_ssh_pass: "root"
 
 interfaces:
-  ens4: "192.168.61.2/30" # HA口
+  eth1: "192.168.61.2/30" # HA口
 #  ens5: "" # WAN口1
 #  ens6: "" # WAN口2
-  ens7: "10.12.99.3/29" # LAN口
+  eth4: "10.12.99.3/29" # LAN口
 
-wan_ifaces: "{ ens5, ens6 }"
+wan_ifaces: "{ eth2, eth3 }"
 
 GW_NET_10: "10.12.0.0/16"
 GW_NET_30: "30.12.0.0/16"
 GW_NETv6_LAN: "fdbd:cd00:1200::/64"
 
 ########## LAN Info ##########
-GW_LAN_Iface: "ens7"
+GW_LAN_Iface: "eth4"
 GW_CSW_IP: "10.12.99.6/29"
 GW_CSW_IPv6: "fdbd:cd00:1200::6/125"
 
@@ -24,7 +24,7 @@ GW_ISP_Num: "2"
 
 # ISP1 Info
 GW_ISP1_Name: "Telecom"
-GW_ISP1_Iface: "ens5"
+GW_ISP1_Iface: "eth2"
 GW_ISP1_IP: "61.8.8.2/30"
 GW_ISP1_Gateway: "61.8.8.1"
 GW_ISP1_IPv6: "2001:61:8:8::2/127"
@@ -33,7 +33,7 @@ GW_ISP1_Bandwidth: "100"
 
 # ISP2 Info
 GW_ISP2_Name: "mobile"
-GW_ISP2_Iface: "ens6"
+GW_ISP2_Iface: "eth3"
 GW_ISP2_IP: "104.8.8.2/30"
 GW_ISP2_Gateway: "104.8.8.1"
 GW_ISP2_Bandwidth: "100"
