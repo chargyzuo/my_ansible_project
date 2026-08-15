@@ -1,4 +1,4 @@
-mac_address: "00:50:00:00:0b:00"
+mac_address: "00:50:00:00:05:00"
 
 interfaces:
   ens4: "59.3.3.2/30"
