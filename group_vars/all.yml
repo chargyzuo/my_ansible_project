@@ -1,2 +1,20 @@
 ansible_user: "root"
 ansible_ssh_pass: "root"
+
+########## 全局探测目标(所有分支通用) ##########
+# ISP 存活探测目标(link-balancer / keepalived 使用)
+ISP_Check_IP1:  "223.5.5.5"
+ISP_Check_IP2:  "119.29.29.29"
+ISP_Check_IP1v6:  "2400:3200::1"
+ISP_Check_IP2v6:  "2001:dc7:1000::1"
+VPN_Check_IP1:  "10.8.8.8"
+VPN_Check_IP2:  "10.8.8.9"
+VPN_Chage_lost:  "20"
+
+########## WG 隧道对端(所有分支通用) ##########
+# hub 公网地址
+WG_server_ISP1: "59.3.3.2"
+WG_server_ISP2: "212.3.3.2"
+# 隧道内网对端(hub 侧)
+ISP1_tunnel_end: "172.20.0.1"
+ISP2_tunnel_end: "172.21.0.1"

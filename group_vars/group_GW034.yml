@@ -1,2 +1,43 @@
+# ===== 分支职场 34(GW03 主 / GW04 备)专有配置 =====
+# 接口角色见 group_vars/spokes.yml;全局探测/隧道对端见 group_vars/all.yml
+#
+# 说明:原仓库分支34只有隧道自身地址,其余地址在此按分支12(group_GW012.yml)
+#      镜像推导(12->34、WAN 取同网段下一个 /30)。真实分配请自行核对/替换。
+
+GW_NET_10: "10.34.0.0/16"
+GW_NET_30: "30.34.0.0/16"
+GW_NETv6_LAN: "fdbd:cd00:3400::/64"
+
+########## LAN Info ##########
+GW_CSW_IP: "10.34.99.6"
+GW_CSW_IPv6: "fdbd:cd00:3400::6/125"
+
+########## WAN Info ##########
+GW_ISP_Num: "2"
+
+# ISP1  (独立互联网专线,与分支12不同网段)
+GW_ISP1_Name: "Telecom"
+GW_ISP1_IP: "71.8.8.6/30"
+GW_ISP1_Net: "71.8.8.4/30"
+GW_ISP1_Gateway: "71.8.8.5"
+GW_ISP1_IPv6: "2001:71:8:8::6/127"     # v6 按新专线推导,请核对
+GW_ISP1_Gatewayv6: "2001:71:8:8::5"
+GW_ISP1_Bandwidth: "100"
+
+# ISP2  (独立互联网专线,与分支12不同网段)
+GW_ISP2_Name: "mobile"
+GW_ISP2_IP: "114.8.8.6/30"
+GW_ISP2_Net: "114.8.8.4/30"
+GW_ISP2_Gateway: "114.8.8.5"
+GW_ISP2_Bandwidth: "100"
+
+########## 隧道自身地址(本分支主备共用,沿用原仓库) ##########
 ISP1_tunnel_self: "172.20.0.103"
 ISP2_tunnel_self: "172.21.0.103"
+
+########## LAN VIP / WAN 公网浮动 VIP / 负载均衡子网 ##########
+LAN_iface_VIP: "10.34.99.1"
+LAN_iface_VIP6: "fdbd:cd00:3400::1"
+GW_ISP1_VIP: "198.51.100.1/26"      # 占位(RFC5737 文档段),替换为 ISP1 真实公网 VIP
+GW_ISP2_VIP: "203.0.113.1/29"       # 占位(RFC5737 文档段),替换为 ISP2 真实公网 VIP
+LB_LAN_subnet_1: "10.34.128.0/17"

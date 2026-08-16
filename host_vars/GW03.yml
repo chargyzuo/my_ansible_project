@@ -1,2 +1,16 @@
+# GW03 — 分支职场 34 主(master)
+# 通用变量见 group_vars/{all,spokes,group_GW034}.yml,本文件只保留本机唯一值
+# 注:分支34地址为按分支12镜像推导,真实分配请核对。
 mac_address: "00:50:00:00:03:00"
 
+interfaces:
+  eth1: "192.168.61.1/30"   # HA 心跳口(与 GW01 一致,分支内点对点隔离链路)
+  eth4: "10.34.99.2/29"     # LAN 口
+  # eth2(ISP1)/eth3(ISP2)地址取自 group_GW034.yml 的 GW_ISP1_IP / GW_ISP2_IP
+
+# 本机双 WAN 网卡 MAC(keepalived 主备切换时做 MAC 漂移,见 notify.sh.j2)
+# 实验占位值,真实环境需填 ISP 登记的 MAC。
+GW_ISP1_IfaceMAC: "87:a8:00:32:76:41"
+GW_ISP1_IfaceMAC_bak: "87:a8:00:32:76:51"
+GW_ISP2_IfaceMAC: "87:a8:00:32:76:42"
+GW_ISP2_IfaceMAC_bak: "87:a8:00:32:76:52"

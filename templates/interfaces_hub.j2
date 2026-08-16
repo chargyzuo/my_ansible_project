@@ -1,21 +1,17 @@
 auto lo
 iface lo inet loopback
 
-# OOB
-auto ens3
-iface ens3 inet dhcp
+# OOB 接口 (eth0, DHCP)
+auto eth0
+iface eth0 inet dhcp
 
-auto ens4
-iface ens4 inet static
-    address {{ interfaces.ens4 }}
+# ISP 接口 (eth2, WAN) —— GW11=ISP1 / GW12=ISP2
+auto eth2
+iface eth2 inet static
+    address {{ interfaces.eth2 }}
 
-# LAN 接口 (ens7)
-auto ens7
-iface ens7 inet static
-    address {{ interfaces.ens7 }}
-
-
-
-###### add static routes ##########
+# LAN 接口 (eth4)
+auto eth4
+iface eth4 inet static
+    address {{ interfaces.eth4 }}
     up ip route add {{ GW_NET_10 }} via {{ GW_CSW_IP }} dev {{ GW_LAN_Iface }} proto 5
-     
