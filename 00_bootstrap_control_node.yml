@@ -1,0 +1,18 @@
+---
+- name: 控制端自举 —— 安装 Ansible 依赖(paramiko + collection)
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: 安装 paramiko(network_cli 底层 SSH 库)
+      ansible.builtin.pip:
+        name: paramiko
+        extra_args: --user
+      # 若报 externally-managed-environment(新版 Debian/PEP668),
+      # 改成: extra_args: --user --break-system-packages
+
+    - name: 按 requirements.yml 安装 collection
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install -r requirements.yml
+      register: galaxy
+      changed_when: "'Nothing to do' not in galaxy.stdout"

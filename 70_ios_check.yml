@@ -1,0 +1,16 @@
+---
+- name: check reachability of RS devices
+  hosts: ios
+  gather_facts: no
+  connection: remote
+
+  tasks:
+    - name: 执行 show version
+      cisco.ios.ios_command:
+        commands:
+          - show version
+      register: out
+
+    - name: 打印回显
+      ansible.builtin.debug:
+        var: out.stdout_lines

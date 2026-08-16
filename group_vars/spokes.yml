@@ -1,0 +1,11 @@
+# 分支出口网关(主备对)通用接口角色定义
+# EVE-NG 拓扑接口口号 <-> Linux 内接口名 <-> 角色
+#   eth0 = OOB 管理口(DHCP)
+#   eth1 = HA 心跳/同步口
+#   eth2 = ISP1 (WAN)
+#   eth3 = ISP2 (WAN)
+#   eth4 = LAN 口
+HA_Iface: "eth1"
+GW_ISP1_Iface: "eth2"
+GW_ISP2_Iface: "eth3"
+GW_LAN_Iface: "eth4"

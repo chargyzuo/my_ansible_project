@@ -1,0 +1,7 @@
+# ios组共同配置
+ansible_connection: ansible.netcommon.network_cli   # 不是 ssh!推 CLI 而非本地执行
+ansible_network_os: cisco.ios.ios                   # 告诉 Ansible 这是 IOS,用哪套解析
+ansible_user: root                                  # = 设备上 username root
+ansible_password: root
+ansible_become: true                                # 进入特权模式(enable)
+ansible_become_method: enable                       # enable无密码
