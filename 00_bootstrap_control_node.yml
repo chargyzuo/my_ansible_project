@@ -4,12 +4,13 @@
   connection: local
   gather_facts: no
   tasks:
-    - name: 安装 paramiko(pin 2.x —— 兼容旧 netcommon + IOL 的 SHA1 算法)
+    - name: 安装 paramiko(最新 3.x —— 与最新 netcommon 8.x 配套，支持 IOL 传输)
       ansible.builtin.pip:
-        name: 'paramiko==2.12.0'
+        name: paramiko
+        state: latest
         extra_args: --user
 
-    - name: 按 requirements.yml 安装并锁定 collection 版本
+    - name: 按 requirements.yml 安装 collection(最新版)
       ansible.builtin.command:
         cmd: ansible-galaxy collection install -r requirements.yml --force
       register: galaxy
