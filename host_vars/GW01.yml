@@ -12,3 +12,8 @@ GW_ISP1_IfaceMAC: "87:a8:00:32:76:21"
 GW_ISP1_IfaceMAC_bak: "87:a8:00:32:76:31"
 GW_ISP2_IfaceMAC: "87:a8:00:32:76:22"
 GW_ISP2_IfaceMAC_bak: "87:a8:00:32:76:32"
+
+
+# keepalived 主备(主):priority 高、nopreempt;无启动延迟,冷启动先抢 MASTER,恢复后不回切避免抖动
+keepalived_priority: 115
+keepalived_preempt: false

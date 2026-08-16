@@ -13,3 +13,9 @@ GW_ISP1_IfaceMAC: "87:a8:00:32:76:41"
 GW_ISP1_IfaceMAC_bak: "87:a8:00:32:76:51"
 GW_ISP2_IfaceMAC: "87:a8:00:32:76:42"
 GW_ISP2_IfaceMAC_bak: "87:a8:00:32:76:52"
+
+
+# keepalived 主备(备):延迟 30s 启动,让主先抢到 MASTER;preempt + 低优先级,起来后退回 BACKUP
+keepalived_priority: 100
+keepalived_preempt: true
+keepalived_startup_delay: 30        # 备机启动延迟(s),.global_defs 里 startup_script sleep

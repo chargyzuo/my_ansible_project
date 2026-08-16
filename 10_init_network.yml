@@ -6,7 +6,7 @@
         template:
           src: interfaces.j2
           dest: /etc/network/interfaces
-          backup: yes  # 自动备份旧配置，万一出问题可以找回
+          backup: yes  #自动备份旧配置，万一出问题可以找回
  
       - name: 彻底移除 ZeroConf 自动 IP 分配工具
         apt:

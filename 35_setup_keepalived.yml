@@ -1,0 +1,66 @@
+---
+- name: 部署 Spoke keepalived 主备(VIP / 策略路由 / MAC 漂移)
+  hosts: spokes
+  become: yes
+  tasks:
+    - name: 安装 keepalived
+      ansible.builtin.apt:
+        name: keepalived
+        state: present
+        update_cache: yes
+
+    - name: 确保 /etc/keepalived 目录存在
+      ansible.builtin.file:
+        path: /etc/keepalived
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: 下发全局配置片段 (.global_defs)
+      ansible.builtin.template:
+        src: templates/global_defs.j2
+        dest: /etc/keepalived/.global_defs
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart keepalived
+
+    - name: 下发主备抢占片段 (.is_preempt，按 keepalived_role 决定 priority/preempt)
+      ansible.builtin.template:
+        src: templates/is_preempt.j2
+        dest: /etc/keepalived/.is_preempt
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart keepalived
+
+    - name: 下发 keepalived 主配置
+      ansible.builtin.template:
+        src: templates/keepalived.conf.j2
+        dest: /etc/keepalived/keepalived.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: restart keepalived
+
+    - name: 下发主备切换脚本 (notify.sh)
+      ansible.builtin.template:
+        src: templates/notify.sh.j2
+        dest: /etc/keepalived/notify.sh
+        owner: root
+        group: root
+        mode: '0755'
+      notify: restart keepalived
+
+    - name: 启用 keepalived 开机自启
+      ansible.builtin.systemd:
+        name: keepalived
+        enabled: yes
+
+  handlers:
+    - name: restart keepalived
+      ansible.builtin.systemd:
+        name: keepalived
+        state: restarted
+        daemon_reload: yes

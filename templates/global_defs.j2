@@ -1,0 +1,6 @@
+{% if keepalived_startup_delay is defined -%}
+global_defs {
+    startup_script "/usr/bin/sleep {{ keepalived_startup_delay }}"
+    startup_script_timeout {{ keepalived_startup_delay_timeout | default(keepalived_startup_delay | int * 2) }}
+}
+{% endif -%}

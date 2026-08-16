@@ -2,8 +2,7 @@ spoke_groups:
   - group_GW012
   - group_GW034
 
-GW_NET_10: "10.211.0.0/16"
-GW_CSW_IP: "10.211.9.6"
+# GW_NET_10 / GW_CSW_IP 每个 hub 各自不同,已下沉到 host_vars/GW11、GW12
 GW_LAN_Iface: "eth4"
 
 # hub nodes

@@ -1,0 +1,2 @@
+{% if keepalived_preempt | default(false) %}preempt{% else %}nopreempt{% endif %}
+priority {{ keepalived_priority }}
