@@ -4,7 +4,7 @@
   connection: local
   vars:
     oob_iface: eth0            # OOB 内网接口(同时是 OOB 网关口)
-    oob_ip: 192.168.99.10
+    oob_ip: 192.168.99.1
     oob_cidr: 192.168.99.0/24
     uplink_iface: eth1         # OOB 互联网出口/上联口(桥接 Cloud0),非业务 WAN
     upstream_dns:
@@ -73,7 +73,7 @@
         name: iptables-persistent
         state: present
 
-    # === 新增任务3:OOB DNS 代理(dnsmasq,响应 DHCP 下发的 192.168.99.10) ===
+    # === 新增任务3:OOB DNS 代理(dnsmasq,响应 DHCP 下发的 192.168.99.1) ===
     - name: 安装 dnsmasq
       apt:
         name: dnsmasq
