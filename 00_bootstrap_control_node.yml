@@ -4,12 +4,10 @@
   connection: local
   gather_facts: no
   tasks:
-    - name: 安装 paramiko(network_cli 底层 SSH 库)
+    - name: 安装 paramiko(pin 2.x —— 兼容旧 netcommon + IOL 的 SHA1 算法)
       ansible.builtin.pip:
-        name: paramiko
+        name: 'paramiko==2.12.0'
         extra_args: --user
-      # 若报 externally-managed-environment(新版 Debian/PEP668),
-      # 改成: extra_args: --user --break-system-packages
 
     - name: 按 requirements.yml 安装并锁定 collection 版本
       ansible.builtin.command:
