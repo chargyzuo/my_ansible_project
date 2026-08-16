@@ -11,8 +11,8 @@
       # 若报 externally-managed-environment(新版 Debian/PEP668),
       # 改成: extra_args: --user --break-system-packages
 
-    - name: 按 requirements.yml 安装 collection
+    - name: 按 requirements.yml 安装并锁定 collection 版本
       ansible.builtin.command:
-        cmd: ansible-galaxy collection install -r requirements.yml
+        cmd: ansible-galaxy collection install -r requirements.yml --force
       register: galaxy
-      changed_when: "'Nothing to do' not in galaxy.stdout"
+      changed_when: "'Installing' in galaxy.stdout or 'Downloading' in galaxy.stdout"
