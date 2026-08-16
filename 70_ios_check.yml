@@ -2,7 +2,6 @@
 - name: check reachability of RS devices
   hosts: ios
   gather_facts: no
-  connection: remote
 
   tasks:
     - name: 执行 show version
