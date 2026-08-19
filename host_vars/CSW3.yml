@@ -3,7 +3,7 @@ oob_IP_addr: "192.168.99.33/24"
 
 
 # CSW有三层SVI
-hostname: HubSW1
+hostname: CSW3
 vlans:
   - vlan_id: 2020
     name: to_GW1
@@ -20,7 +20,7 @@ svis:
 
   - name: Vlan2030
     ipv4:
-      - address: 10.212.9.2/16
+      - address: 10.212.9.2/30
 
   - name: Vlan500
     ipv4:
@@ -29,11 +29,18 @@ svis:
 
 l2_ports:
   - name: Ethernet0/0                  # GW_HUB1
-    mode: access
-    access_vlan: 2020
+    access:
+      vlan: 2020
   - name: Ethernet0/1                  # GW_HUB2
-    mode: access
-    access_vlan: 2030
+    access:
+      vlan: 2030
+  - name: Ethernet0/3
+    mode: trunk
+    trunk:
+      encapsulation: dot1q
+      allowed_vlans:
+        - 500
+
 
 l3_ports:
   - name: Loopback1
@@ -56,9 +63,18 @@ static_routes:
 # 接口描述
 interfaces_cfg:
   - name: Ethernet0/0
-    description: "uplink-to-GW1"
+    description: "to-GW1"
     enabled: true                     # true = no shutdown;false = shutdown
   - name: Ethernet0/1
-    description: "uplink-to-GW2"
+    description: "to-GW2"
+    enabled: true
+  - name: Vlan2020
+    description: "to-GW1"
+    enabled: true
+  - name: Vlan2030
+    description: "to-GW2"
+    enabled: true
+  - name: Vlan500
+    description: "server"
     enabled: true
 

@@ -11,23 +11,23 @@ vlans:
 
 l2_ports:
   - name: Ethernet0/0                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3010
+    access:
+      vlan: 3010
   - name: Ethernet0/2                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3010
+    access:
+      vlan: 3010
   - name: Ethernet1/1                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3010
+    access:
+      vlan: 3010
 
 
 
   - name: Ethernet1/0                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3020
+    access:
+      vlan: 3020
   - name: Ethernet0/1                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3020
+    access:
+      vlan: 3020
   - name: Ethernet0/3                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3020
+    access:
+      vlan: 3020

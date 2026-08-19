@@ -2,7 +2,7 @@
 oob_IP_addr: "192.168.99.30/24"
 
 # HubSW纯二层透传
-hostname: HubSW1
+hostname: HubSW3
 vlans:
   - vlan_id: 3010
     name: ISP1
@@ -12,15 +12,15 @@ vlans:
 
 l2_ports:
   - name: Ethernet0/0                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3010
+    access:
+      vlan: 3010
   - name: Ethernet0/3                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3010
+    access:
+      vlan: 3010
 
   - name: Ethernet0/1                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3020
+    access:
+      vlan: 3020
   - name: Ethernet0/2                  # 注意 IOL 是 Ethernet0/x
-    mode: access
-    access_vlan: 3020
+    access:
+      vlan: 3020
