@@ -1,2 +1,50 @@
 # 通过OOB_IP来定位和区别交换机路由器设备
 oob_IP_addr: "192.168.99.251/24"
+
+hostname: ISP1
+
+l3_ports:
+  - name: Ethernet0/2
+    ipv4:
+      - address: 59.3.3.2/24        # 面向 hub 的"公网"口
+
+  - name: Ethernet0/0
+    ipv4:
+      - address: 61.8.8.1/30
+
+  - name: Ethernet0/1
+    ipv4:
+      - address: 71.8.8.5/30
+
+  - name: Loopback10
+    ipv4:
+      - address: 8.8.8.8/32
+
+
+
+
+
+interfaces_cfg:
+  - name: Ethernet0/2
+    description: "to-Hub-ISP1"
+    enabled: true
+  - name: Ethernet0/0
+    description: "to-GW012"
+    enabled: true
+  - name: Ethernet0/1
+    description: "to-GW032"
+    enabled: true
+  - name: Loopback10
+    description: "Internet_test"
+    enabled: true
+
+
+
+# ios_static_routes 结构按地址族嵌套
+static_routes:
+  - address_families:
+      - afi: ipv4
+        routes:
+          - dest: 0.0.0.0/0
+            next_hops:
+              - forward_router_address: 59.3.3.1

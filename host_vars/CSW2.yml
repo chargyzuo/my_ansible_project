@@ -1,2 +1,56 @@
 # 通过OOB_IP来定位和区别交换机路由器设备
 oob_IP_addr: "192.168.99.22/24"
+
+
+# CSW有三层SVI
+hostname: HubSW1
+vlans:
+  - vlan_id: 2020
+    name: to_GW
+  - vlan_id: 200
+    name: wired-tier
+  - vlan_id: 300
+    name: guest
+
+
+svis:
+  - name: Vlan2020
+    ipv4:
+      - address: 10.34.99.6/29
+
+  - name: Vlan200
+    ipv4:
+      - address: 10.34.0.1/16
+
+  - name: Vlan300
+    ipv4:
+      - address: 30.34.0.1/16
+
+
+l2_ports:
+  - name: Ethernet0/0                  # GW主设备
+    mode: access
+    access_vlan: 2020
+  - name: Ethernet0/1                  # GW备设备
+    mode: access
+    access_vlan: 2020
+
+
+# ios_static_routes 结构按地址族嵌套
+static_routes:
+  - address_families:
+      - afi: ipv4
+        routes:
+          - dest: 0.0.0.0/0
+            next_hops:
+              - forward_router_address: 10.34.99.1
+
+# 接口描述
+interfaces_cfg:
+  - name: Ethernet0/0
+    description: "uplink-to-GW1"
+    enabled: true                     # true = no shutdown;false = shutdown
+  - name: Ethernet0/1
+    description: "uplink-to-GW2"
+    enabled: true
+

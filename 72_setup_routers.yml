@@ -1,0 +1,30 @@
+---
+- name: IOS 路由器基础配置
+  hosts: routers
+  gather_facts: no
+  tasks:
+    - name: 配置 hostname
+      cisco.ios.ios_hostname:
+        config:
+          hostname: "{{ hostname }}"
+        state: merged
+
+    - name: 配置三层接口 IP
+      cisco.ios.ios_l3_interfaces:
+        config: "{{ l3_ports }}"
+        state: merged
+
+    - name: 打开接口
+      cisco.ios.ios_interfaces:
+        config: "{{ interfaces_cfg }}"
+        state: merged
+
+    - name: 配置静态路由
+      cisco.ios.ios_static_routes:
+        config: "{{ static_routes }}"
+        state: merged
+      when: static_routes is defined
+
+    - name: 保存配置
+      cisco.ios.ios_config:
+        save_when: modified

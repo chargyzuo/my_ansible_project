@@ -1,0 +1,7 @@
+# ios 组共同配置
+ansible_connection: ansible.netcommon.network_cli   # ← 关键!不是 ssh,是 network_cli
+ansible_network_os: cisco.ios.ios                   # ← 告诉 Ansible 这是 IOS,用哪套解析器
+ansible_user: root                                  # 登录设备的用户名(= 设备上 username root)
+ansible_password: root                              # 登录密码
+ansible_become: true                                # 登录后是否进入特权模式(enable)
+ansible_become_method: enable                       # 用 enable 提权(实验里 enable 无密码)
