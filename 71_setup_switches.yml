@@ -39,6 +39,12 @@
         state: merged
       when: interfaces_cfg is defined
 
+    - name: 配置静态路由
+      cisco.ios.ios_static_routes:
+        config: "{{ static_routes }}"
+        state: merged
+      when: static_routes is defined
+
     - name: 保存 running-config 到 startup-config
       cisco.ios.ios_config:
         save_when: modified

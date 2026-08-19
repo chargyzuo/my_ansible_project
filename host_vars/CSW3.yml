@@ -35,6 +35,13 @@ l2_ports:
     mode: access
     access_vlan: 2030
 
+l3_ports:
+  - name: Loopback1
+    ipv4:
+      - address: 10.8.8.8/32
+  - name: Loopback2
+    ipv4:
+      - address: 10.8.8.9/32
 
 # ios_static_routes 结构按地址族嵌套
 static_routes:

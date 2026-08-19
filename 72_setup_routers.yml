@@ -19,11 +19,11 @@
         config: "{{ interfaces_cfg }}"
         state: merged
 
-    - name: 配置静态路由
-      cisco.ios.ios_static_routes:
-        config: "{{ static_routes }}"
-        state: merged
-      when: static_routes is defined
+#    - name: 配置静态路由
+#      cisco.ios.ios_static_routes:
+#        config: "{{ static_routes }}"
+#        state: merged
+#      when: static_routes is defined
 
     - name: 保存配置
       cisco.ios.ios_config:
