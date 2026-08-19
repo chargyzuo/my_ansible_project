@@ -9,3 +9,6 @@ HA_Iface: "eth1"
 GW_ISP1_Iface: "eth2"
 GW_ISP2_Iface: "eth3"
 GW_LAN_Iface: "eth4"
+wan_ifaces:
+  - "{{ GW_ISP1_Iface }}"
+  - "{{ GW_ISP2_Iface }}"

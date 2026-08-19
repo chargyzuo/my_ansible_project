@@ -2,6 +2,28 @@
 - name: 安装并配置 nftables 网关防火墙
   hosts: spokes
   tasks:
+  pre_tasks:
+    - name: 替换为 Debian buster 归档源
+      copy:
+        dest: /etc/apt/sources.list
+        content: |
+          deb http://archive.debian.org/debian buster main contrib non-free
+          deb http://archive.debian.org/debian-security buster/updates main contrib non-free
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: 关闭 archive 源的时间有效性校验
+      copy:
+        dest: /etc/apt/apt.conf.d/99no-check-valid-until
+        content: 'Acquire::Check-Valid-Until "false";'
+        mode: '0644'
+
+    - name: 刷新 apt 缓存(忽略归档源过期告警)
+      apt:
+        update_cache: yes
+
+
     - name: 安装 nftables
       apt:
         name: nftables
