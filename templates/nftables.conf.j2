@@ -12,6 +12,13 @@ table inet filter {
 
         # TCP MSS Clamping: 针对 WireGuard 等接口自动调整 MSS
         oifname "wg*" tcp flags syn tcp option maxseg size set rt mtu
+
+        # Guest 网段(30 段)隔离: 仅允许上网,不得与内网(10 段)互通
+        # 已建立/相关连接放行(保证 10 段主动访问的回程不被误伤)
+        ct state established,related accept
+        # 双向丢弃 30<->10, 阻断 Guest 与内网互访
+        ip saddr {{ GW_NET_30 }} ip daddr {{ GW_NET_10 }} drop
+        ip saddr {{ GW_NET_10 }} ip daddr {{ GW_NET_30 }} drop
     }
 
     chain output {

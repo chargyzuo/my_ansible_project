@@ -2,12 +2,14 @@
 Address = {{ tunnel_self_IP }}
 ListenPort = 51820
 PrivateKey = {{ lookup('ansible.builtin.file', './keys/' + group_names[0] + '/private.key') }}
+{# 路由交给 BIRD 管理,wg-quick 不写主表 #}
+Table = off
 
-# 自动遍历所有的 spoke 组
+{# 本 hub 只承载一种隧道:ct(ISP1) 或 cu(ISP2),由 host_vars 的 hub_tunnel_kind 决定 #}
+{# 设计原则:WireGuard 只做传输不做路由控制,AllowedIPs 放全部路由;路由控制交给 BIRD #}
 {% for sub_group in spoke_groups %}
-# Peer for {{ sub_group }}
+# Peer for {{ sub_group }} ({{ hub_tunnel_kind }})
 [Peer]
 PublicKey = {{ lookup('ansible.builtin.file', './keys/' + sub_group + '/public.key') }}
-# 假设每组第一个成员的变量代表全组的隧道 IP
-AllowedIPs = 0.0.0.0/0
+AllowedIPs = 0.0.0.0/0, ::/0
 {% endfor %}

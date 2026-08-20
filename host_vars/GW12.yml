@@ -11,3 +11,6 @@ GW_NET_10: "10.212.0.0/16"
 GW_CSW_IP: "10.212.9.2"
 
 tunnel_self_IP: "172.21.0.1/24"
+
+# 本 hub 只承载 cu(ISP2)隧道,WG/BIRD 模板据此只对接各 spoke 的 cu 隧道
+hub_tunnel_kind: "cu"

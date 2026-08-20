@@ -11,13 +11,13 @@
     - name: 下发 Spoke 隧道1 配置
       ansible.builtin.template:
         src: templates/WG_spoke_tnlct.conf.j2
-        dest: /etc/wireguard/wgct.conf
+        dest: /etc/wireguard/WG_spoke_tnlct.conf
         mode: '0600'
     
     - name: 下发 Spoke 隧道2 配置
       ansible.builtin.template:
         src: templates/WG_spoke_tnlcu.conf.j2
-        dest: /etc/wireguard/wgcu.conf
+        dest: /etc/wireguard/WG_spoke_tnlcu.conf
         mode: '0600'
 
 
@@ -37,4 +37,18 @@
         src: templates/WG_hub.conf.j2
         dest: /etc/wireguard/wg0.conf
         mode: '0600'
-      
+      notify: restart wg0
+
+    - name: 启用并拉起 Hub WireGuard 隧道 (wg-quick@wg0)
+      ansible.builtin.systemd:
+        name: wg-quick@wg0
+        enabled: yes
+        state: started
+
+  handlers:
+    # hub 无 keepalived,隧道生命周期由本 play 直接管理;
+    # 配置变更时重启接口使新 peer/AllowedIPs 生效
+    - name: restart wg0
+      ansible.builtin.systemd:
+        name: wg-quick@wg0
+        state: restarted

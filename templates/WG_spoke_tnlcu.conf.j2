@@ -1,14 +1,15 @@
-Interface]
+[Interface]
 {# lookup 自动去控制器本地 keys/组名/ 目录下读取私钥 #}
 PrivateKey = {{ lookup('ansible.builtin.file', './keys/' + group_names[0] + '/private.key') }}
 Address = {{ ISP2_tunnel_self }}/24
-ListenPort = 51820
+{# 路由交给 BIRD/内核策略路由管理,wg-quick 不写主表,避免两条隧道 AllowedIPs 冲突 #}
+Table = off
 
 [Peer]
-{# 连接 Hub 02 cucc #}
-PublicKey = {{ lookup('ansible.builtin.file', './keys/' + group_names[0] + '/private.key') }}
+{# 连接 Hub02 = GW12 (cu / ISP2),Peer 处填对端 hub 的公钥 #}
+PublicKey = {{ lookup('ansible.builtin.file', './keys/hub2/public.key') }}
 Endpoint = {{ WG_server_ISP2 }}:51820
-AllowedIPs = 0.0.0.0/0
+AllowedIPs = 0.0.0.0/0, ::/0
 PersistentKeepalive = 8
 
 

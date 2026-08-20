@@ -95,19 +95,22 @@ template bgp wg_spoke {
     };
 }
 
-{# 自动轮询 Spoke 组生成 BGP 邻居 #}
+{# 本 hub 只承载一种隧道:ct(ISP1) 或 cu(ISP2),据此只与各 spoke 对应那条隧道建 BGP #}
 {% for sub_group in spoke_groups %}
 {# 从该组的第一个成员获取隧道 IP 变量 #}
 {% set peer_vars = hostvars[groups[sub_group][0]] %}
 
-# BGP Peers for {{ sub_group }}
+{% if hub_tunnel_kind == 'ct' %}
+# BGP Peer (CTCC / ISP1) to {{ sub_group }}
 protocol bgp {{ sub_group }}_ct from wg_spoke {
     description "CTCC tunnel to {{ sub_group }}";
     neighbor {{ peer_vars['ISP1_tunnel_self'] }};
 }
-
+{% else %}
+# BGP Peer (CMCC / ISP2) to {{ sub_group }}
 protocol bgp {{ sub_group }}_cu from wg_spoke {
     description "CMCC tunnel to {{ sub_group }}";
     neighbor {{ peer_vars['ISP2_tunnel_self'] }};
 }
+{% endif %}
 {% endfor %}

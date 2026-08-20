@@ -92,10 +92,12 @@ template bgp wgs {
     };
 }
 
+# ct 隧道 -> Hub01 (GW11 / ISP1),邻居地址取 all.yml 的 ISP1_tunnel_end
 protocol bgp wgctcc from wgs {
-    neighbor 172.20.0.1;
+    neighbor {{ ISP1_tunnel_end }};
 }
 
+# cu 隧道 -> Hub02 (GW12 / ISP2),邻居地址取 all.yml 的 ISP2_tunnel_end
 protocol bgp wgcucc from wgs {
-    neighbor 172.21.0.1;
+    neighbor {{ ISP2_tunnel_end }};
 }
