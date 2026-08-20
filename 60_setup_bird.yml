@@ -6,7 +6,7 @@
   tasks:
     - name: 安装 BIRD 2
       ansible.builtin.apt:
-        name: bird2
+        name: bird
         state: present
         update_cache: yes
 
@@ -32,7 +32,7 @@
   tasks:
     - name: 安装 BIRD 2
       ansible.builtin.apt:
-        name: bird2
+        name: bird
         state: present
         update_cache: yes
 

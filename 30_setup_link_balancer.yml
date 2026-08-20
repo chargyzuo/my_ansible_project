@@ -78,3 +78,30 @@
         - { id: 201, name: 'ISP1' }
         - { id: 202, name: 'ISP2' }
         - { id: 203, name: 'LB' }
+
+    # ------------------------------------------------------------------
+    # 关闭 firehol 自带防火墙。
+    # 说明：我们安装 firehol 仅为获取 link-balancer 多 WAN 策略路由工具，
+    # 并不需要它附带的默认防火墙服务。该服务默认自启，且默认策略为
+    # policy DROP + 仅放行 ESTABLISHED，会丢弃所有 NEW 入站流量
+    # （SSH、ICMP echo request 等），导致 GW 从管理网侧不可达。
+    # 且 firehol 写在 iptables-legacy 后端，`nft list ruleset` 看不到。
+    # 防火墙职责统一由 20_setup_nftables.yml 部署的 nftables 承担。
+    # ------------------------------------------------------------------
+    - name: 禁止 firehol 防火墙服务开机自启 (START_FIREHOL=NO)
+      ansible.builtin.lineinfile:
+        path: /etc/default/firehol
+        regexp: '^\s*START_FIREHOL\s*='
+        line: 'START_FIREHOL=NO'
+        state: present
+        create: yes
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: 停止并禁用 firehol 防火墙服务
+      ansible.builtin.systemd:
+        name: firehol
+        state: stopped
+        enabled: no
+      failed_when: false   # 服务可能未注册/不存在，忽略以保证幂等
